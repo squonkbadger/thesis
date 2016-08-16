@@ -1,1 +1,1 @@
-# thesis
+# Wireless Biopotential Recorder - Thesis
