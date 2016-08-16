@@ -1,15 +1,15 @@
 function showNavLinks() {
     $(".nav").empty();
-    $(".nav").append($("<li><button class='btn'>Sessions</button></li>")
+    $(".nav").append($("<li><button class='btn btn-lg navbar-btn'>Sessions</button></li>")
         .attr("role", "presentation")
         .attr("id", "sess-link"));
-    $(".nav").append($("<li><button class='btn'>Courses</button></li>")
+    $(".nav").append($("<li><button class='btn btn-lg navbar-btn'>Courses</button></li>")
         .attr("role", "presentation")
         .attr("id", "crs-link"));
-    $(".nav").append($("<li><button class='btn'>Patients</button></li>")
+    $(".nav").append($("<li><button class='btn btn-lg navbar-btn'>Patients</button></li>")
         .attr("role", "presentation")
         .attr("id", "pat-link"));
-    $(".nav").append($("<li><button class='btn'>Instructors</button></li>")
+    $(".nav").append($("<li><button class='btn btn-lg navbar-btn'>Instructors</button></li>")
         .attr("role", "presentation")
         .attr("id", "instr-link"));
     $("#sess-link").click(function() {
@@ -50,7 +50,7 @@ function populatePatientsTable(patients) {
             .addClass("table table-bordered").attr("id", "patients-table");
         var thead = $("<thead>");
         var tr = $("<tr>");
-        tr.append($("<th>Patient ID</th>"));
+        //tr.append($("<th>Patient ID</th>"));
         tr.append($("<th>Patient code</th>"));
         tr.append($("<th>Options</th>"));
         thead.append(tr);
@@ -59,12 +59,12 @@ function populatePatientsTable(patients) {
         $("#page-specific").append(table);
         $.each(patients, function(index, patient) {
             var row = $("<tr>");
-            row.append($("<td>").text(patient.id));
+            //row.append($("<td>").text(patient.id));
             row.append($("<td>").text(patient.code));
             var editButton = $("<button>Edit</button>")
                 .addClass("btn btn-default")
                 .attr("id","edit" + patient.id);
-            row.append(editButton);
+            row.append($("<td>").append(editButton));
             editButton.click(function() {
                 editPatientForm(patient.id);            
             });            
@@ -133,7 +133,7 @@ function populateInstructorsTable(instructors) {
             .addClass("table table-bordered").attr("id", "instructors-table");
         var thead = $("<thead>");
         var tr = $("<tr>");
-        tr.append($("<th>Instructor ID</th>"));
+        //tr.append($("<th>Instructor ID</th>"));
         tr.append($("<th>Name</th>"));
         tr.append($("<th>Email</th>"));
         tr.append($("<th>Options</th>"));
@@ -143,13 +143,13 @@ function populateInstructorsTable(instructors) {
         $("#page-specific").append(table);
         $.each(instructors, function(index, instructor) {
             var row = $("<tr>");
-            row.append($("<td>").text(instructor.id));
+            //row.append($("<td>").text(instructor.id));
             row.append($("<td>").text(instructor.name));
             row.append($("<td>").text(instructor.email));
             var editButton = $("<button>Edit</button>")
                 .addClass("btn btn-default")
                 .attr("id","edit" + instructor.id);
-            row.append(editButton);
+            row.append($("<td>").append(editButton));
             editButton.click(function() {
                 editInstructorForm(instructor.id);            
             });            
@@ -211,9 +211,9 @@ function populateCoursesTable(courses) {
     $("#page-specific").append("<h2>Courses</h2>");
     $("#page-specific")
         .append($(" <button>Add course</button>")
-        .addClass("btn btn-default")
-        .attr("type", "button")
-        .attr("id", "add-course"));
+            .addClass("btn btn-default")
+            .attr("type", "button")
+            .attr("id", "add-course"));
     $("#add-course").click(function() {
         addCourseForm();
     });
@@ -222,9 +222,9 @@ function populateCoursesTable(courses) {
             .addClass("table table-bordered").attr("id", "courses-table");
         var thead = $("<thead>");
         var tr = $("<tr>");
-        tr.append($("<th>Course ID</th>"));
-        tr.append($("<th>Instructor ID</th>"));
+        //tr.append($("<th>Course ID</th>"));
         tr.append($("<th>Name</th>"));
+        tr.append($("<th>Instructor</th>"));      
         tr.append($("<th>Code</th>"));
         tr.append($("<th>Credit Value</th>"));
         tr.append($("<th>Options</th>"));
@@ -234,19 +234,24 @@ function populateCoursesTable(courses) {
         $("#page-specific").append(table);
         $.each(courses, function(index, course) {
             var row = $("<tr>");
-            row.append($("<td>").text(course.id));
-            row.append($("<td>").text(course.instructor_id));
-            row.append($("<td>").text(course.name));
-            row.append($("<td>").text(course.code));
-            row.append($("<td>").text(course.credit_value));
-            var editButton = $("<button>Edit</button>")
-                .addClass("btn btn-default")
-                .attr("id","edit" + course.id);
-            row.append(editButton);
-            editButton.click(function() {
-                editCourseForm(course.id);            
-            });            
-            $("#courses-table tbody").append(row);
+            //row.append($("<td>").text(course.id));
+            $.get("/api/instructors/" + course.instructor_id)
+                .done(function(instructor) {
+                    row.append($("<td>").text(course.name));
+                    row.append($("<td>").text(instructor.name));
+                    row.append($("<td>").text(course.code));
+                    row.append($("<td>").text(course.credit_value));
+                    var editButton = $("<button>Edit</button>")
+                        .addClass("btn btn-default")
+                        .attr("id","edit" + course.id);
+                    row.append($("<td>").append(editButton));
+                    editButton.click(function() {
+                        editCourseForm(course.id);            
+                    });            
+            $("#courses-table tbody").append(row);                 
+                });
+            
+            
         });
     } else {
         $("#page-specific").append("<h3>No courses available</h3>");
@@ -329,7 +334,7 @@ function populateSessionsTable(sessions) {
         .addClass("table table-bordered").attr("id", "sessions-table");
     var thead = $("<thead>");
     var tr = $("<tr>");
-    tr.append($("<th>Session ID</th>"));
+    //tr.append($("<th>Session ID</th>"));
     tr.append($("<th>Start time</th>"));
     tr.append($("<th>End time</th>"));
     tr.append($("<th>Course ID</th>"));
@@ -337,14 +342,14 @@ function populateSessionsTable(sessions) {
     tr.append($("<th>Instructor ID</th>"));
     tr.append($("<th>Sample rate</th>"));
     tr.append($("<th>Measurement resolution</th>"));
-    tr.append($("<th>Options</th>"));
+    tr.append($("<th colspan=\"2\">Options</th>"));
     thead.append(tr);
     table.append(thead);
     table.append($("<tbody>"));
     $("#page-specific").append(table);
     $.each(sessions, function(index, session) {
         var row = $("<tr>");
-        row.append($("<td>").text(session.id));
+        //row.append($("<td>").text(session.id));
         row.append($("<td>").text(session.start_time));
         row.append($("<td>").text(session.end_time));
         row.append($("<td>").text(session.course_id));
@@ -355,17 +360,17 @@ function populateSessionsTable(sessions) {
         var editButton = $("<button>Edit</button>")
             .addClass("btn btn-default")
             .attr("id","edit" + session.id);
-        row.append(editButton);
+        row.append($("<td>").append(editButton));
         editButton.click(function() {
                 editSessionForm(session.id);            
         });   
-        var sampleButton = $("<button>View samples</button>")
+        var sampleButton = $("<button>View samples</button></td>")
             .addClass("btn btn-default")
             .attr("id", "samples" + session.id);
         sampleButton.click(function() {
             page("/sessions/" + session.id);
         });       
-        row.append(sampleButton);
+        row.append($("<td>").append(sampleButton));
         $("#sessions-table tbody").append(row);
     });
 }

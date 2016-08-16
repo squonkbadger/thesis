@@ -156,6 +156,7 @@ class Database(object):
             
             WHERE id = ?
         """, (course_id, instructor_id, patient_id, sample_rate, resolution,session_id))
+        self.conn.commit()
         
     def fetch_samples(self, session_id):
         cursor = self.conn.cursor()

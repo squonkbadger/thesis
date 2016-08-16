@@ -1,0 +1,45 @@
+body {
+    background: #f0f0f0; 
+    font-family:'Tahoma';
+}
+
+#app-container {
+    background: rgba(255,255,255,1);
+    padding-bottom:1em;
+}
+
+.page-header {
+    background: rgba(0,0,0,1);
+    color: white;
+    padding:1em;
+    margin-top: 1em;
+    margin-bottom:0;
+}
+
+#page-specific {
+    padding: 0em 3em 3em 3em;
+    border: solid black 0.1em;
+}
+
+table {
+    margin-top: 1em;
+}
+
+.table {
+    width:auto;
+}
+
+.table button {
+    margin: auto;
+    display: block;
+
+}
+
+.navbar-btn {
+    border: solid black 0.1em;
+}
+
+.btn:hover {
+    background: rgba(0,0,0,1);
+    color: white;
+}
