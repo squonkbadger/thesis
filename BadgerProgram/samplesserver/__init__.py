@@ -15,6 +15,7 @@ from .patient_list_handler import PatientListHandler
 from .patient_handler import PatientHandler
 from .instructor_handler import InstructorHandler
 from .course_handler import CourseHandler
+from .session_handler import SessionHandler
 
 
 

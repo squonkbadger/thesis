@@ -133,6 +133,30 @@ class Database(object):
         sessions = cursor.fetchall()
         return sessions
     
+    def fetch_session(self, session_id): 
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT *
+            FROM sessions
+            WHERE id = ?
+        """, session_id)
+        session = cursor.fetchone()
+        return session
+    
+    def edit_session(self, session_id, course_id, instructor_id, patient_id, sample_rate, resolution):
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            UPDATE sessions
+            SET 
+                course_id = ?, 
+                instructor_id = ?,
+                patient_id = ?,
+                sample_rate = ?,
+                resolution = ?
+            
+            WHERE id = ?
+        """, (course_id, instructor_id, patient_id, sample_rate, resolution,session_id))
+        
     def fetch_samples(self, session_id):
         cursor = self.conn.cursor()
         cursor.execute("""

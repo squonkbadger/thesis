@@ -28,27 +28,72 @@
             <div id="page-specific">
             </div>
         </div>
+        <script id="session-form-template" type="text/x-handlebars-template">
+            <form id="session-form">
+                <div class="form-group">
+                    <label for="sessionInstructor">Instructor</label>
+                    <select  class="form-control" id="sessionInstructor">
+                    {{#each instructors}}
+                        
+                        <option value="{{id}}" {{#if selected}} selected {{/if}}>{{name}}</option> 
+                        
+                    {{/each}}               
+                </select>
+                </div>
+                <div class="form-group">
+                    <label for="sessionPatient">Patient</label>
+                    <select  class="form-control" id="sessionPatient">
+                    {{#each patients}}
+                        
+                        <option value="{{id}}" {{#if selected}} selected {{/if}}>{{code}}</option> 
+                        
+                    {{/each}}               
+                </select>
+                </div>
+                <div class="form-group">
+                    <label for="sessionCourse">Course</label>
+                    <select  class="form-control" id="sessionCourse">
+                    {{#each courses}}
+                        
+                        <option value="{{id}}" {{#if selected}} selected {{/if}}>{{name}}</option> 
+                        
+                    {{/each}}               
+                </select>
+                </div>
+                <div class="form-group">
+                    <label for="sessionRate">Sample rate (in Hz)</label>
+                    <input type="number" class="form-control" id="sessionRate" placeholder="sample rate" value="{{session.sample_rate}}">
+                </div>
+                <div class="form-group">
+                    <label for="sessionResolution">Measurement resolution</label>
+                    <input type="number" class="form-control" id="sessionResolution" placeholder="Resolution" value="{{session.resolution}}">
+                </div>
+                <button type="submit" class="btn btn-default">Submit</button>
+            </form>
+        </script>
         <script id="course-form-template" type="text/x-handlebars-template">
            <form id="course-form">
               <div class="form-group">
                 <label for="courseName">Course name</label>
-                <input type="text" class="form-control" id="courseName" placeholder="Course name">
+                <input type="text" class="form-control" id="courseName" placeholder="Course name" value="{{course.name}}">
               </div>
               <div class="form-group">
                 <label for="courseCode">Course code</label>
-                <input type="text" class="form-control" id="courseCode" placeholder="Course code">
+                <input type="text" class="form-control" id="courseCode" placeholder="Course code" value="{{course.code}}">
               </div>
               <div class="form-group">
                 <label for="courseInstructor">Course instructor</label>
                 <select  class="form-control" id="courseInstructor">
                     {{#each instructors}}
-                        <option value="{{id}}">{{name}}</option> 
+                        
+                        <option value="{{id}}" {{#if selected}} selected {{/if}}>{{name}}</option> 
+                        
                     {{/each}}               
                 </select>
               </div>
               <div class="form-group">
                 <label for="courseCredits">Course credits</label>
-                <input type="number" min="0" class="form-control" id="courseCredits" placeholder="Credits">
+                <input type="number" min="0" class="form-control" id="courseCredits" placeholder="Credits" value="{{course.credit_value}}">
               </div>
               <button type="submit" class="btn btn-default">Submit</button>
             </form>

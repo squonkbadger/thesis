@@ -21,8 +21,8 @@ class CourseHandler(tornado.web.RequestHandler):
             })
             
     def post(self, course_id):
-        instructor_name = self.get_body_argument("instructor_name")
+        instructor_id = self.get_body_argument("instructor_id")
         name = self.get_body_argument("name")
         code = self.get_body_argument("code")
         credit_value = self.get_body_argument("credit_value")
-        self.application.db.edit_patient(course_id, instructor_name, name, code, credit_value)
+        self.application.db.edit_patient(course_id, instructor_id, name, code, credit_value)

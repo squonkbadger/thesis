@@ -289,14 +289,20 @@ function editCourseForm(id) {
                     $("#page-specific").append("<h2>Edit course</h2>");
                     var source = $("#course-form-template").html();
                     var template = Handlebars.compile(source);  
-                    data = {course: course, instructors: instructors};    
+                    var data = {course: course, instructors: instructors.instructors};
+                    $.each(instructors, function(index, instructor) {
+                        if (instructor.id === course.instructor_id) {
+                            instructor.selected = true;                        
+                        }
+                    });    
                     $("#page-specific").append(template(data)); 
                     $("#course-form").submit(function() {
+                        $("form button").prop("disabled", true);
                         var name = $("#courseName").val();
                         var instructor_id = $("#courseInstructor").val();
                         var code = $("#courseCode").val();
                         var credits = $("#courseCredits").val();
-                        $.post("/api/courses", {
+                        $.post("/api/courses/"+ id, {
                             name: name, 
                             instructor_id: instructor_id, 
                             code: code, 
@@ -328,8 +334,10 @@ function populateSessionsTable(sessions) {
     tr.append($("<th>End time</th>"));
     tr.append($("<th>Course ID</th>"));
     tr.append($("<th>Patient ID</th>"));
+    tr.append($("<th>Instructor ID</th>"));
     tr.append($("<th>Sample rate</th>"));
     tr.append($("<th>Measurement resolution</th>"));
+    tr.append($("<th>Options</th>"));
     thead.append(tr);
     table.append(thead);
     table.append($("<tbody>"));
@@ -341,13 +349,83 @@ function populateSessionsTable(sessions) {
         row.append($("<td>").text(session.end_time));
         row.append($("<td>").text(session.course_id));
         row.append($("<td>").text(session.patient_id));
+        row.append($("<td>").text(session.instructor_id));
         row.append($("<td>").text(session.sample_rate + " Hz"));
         row.append($("<td>").text(session.resolution));
-        row.click(function() {
+        var editButton = $("<button>Edit</button>")
+            .addClass("btn btn-default")
+            .attr("id","edit" + session.id);
+        row.append(editButton);
+        editButton.click(function() {
+                editSessionForm(session.id);            
+        });   
+        var sampleButton = $("<button>View samples</button>")
+            .addClass("btn btn-default")
+            .attr("id", "samples" + session.id);
+        sampleButton.click(function() {
             page("/sessions/" + session.id);
         });       
+        row.append(sampleButton);
         $("#sessions-table tbody").append(row);
     });
+}
+
+function editSessionForm(id) {
+    $.get("/api/sessions/" + id)
+        .done(function(session) {
+            $.get("/api/instructors")
+                .done(function(instructors) {
+                    $.get("/api/patients") 
+                        .done(function(patients) {
+                            $.get("/api/courses")
+                                .done(function(courses) {
+                                    $("#page-specific").empty();
+                                    showNavLinks();
+                                    $("#page-specific").append("<h2>Edit session</h2>");
+                                    var source = $("#session-form-template").html();
+                                    var template = Handlebars.compile(source);
+                                    var data = {
+                                        session: session, 
+                                        instructors: instructors.instructors,
+                                        courses: courses.courses,
+                                        patients: patients.patients                                    
+                                    };
+                                    $.each(instructors, function(index, instructor) {
+                                        if (instructor.id === session.instructor_id) {
+                                        instructor.selected = true;                        
+                                        }
+                                    });   
+                                    $.each(courses, function(index, course) {
+                                        if (course.id === session.course_id) {
+                                        course.selected = true;                        
+                                        }
+                                    });   
+                                    $.each(patients, function(index, patient) {
+                                        if (patient.id === session.patient_id) {
+                                        patient.selected = true;                        
+                                        }
+                                    });   
+                                    $("#page-specific").append(template(data)); 
+                                    $("#session-form").submit(function() {
+                                        $("form button").prop("disabled", true);
+                                        var sample_rate = $("#sessionRate").val();
+                                        var instructor_id = $("#sessionInstructor").val();
+                                        var course_id = $("#sessionCourse").val();
+                                        var patient_id = $("#sessionPatient").val();
+                                        var resolution = $("#sessionResolution").val();
+                                        $.post("/api/sessions/" + id, {
+                                            sample_rate: sample_rate, 
+                                            instructor_id: instructor_id, 
+                                            course_id: course_id, 
+                                            patient_id: patient_id,
+                                            resolution: resolution
+                                        });
+                                        return false;
+                                    });
+                            });
+                    });
+            });
+ });
 }
 
 function showSamples(ctx) {

@@ -28,6 +28,7 @@ def make_app():
         (r"/api/patients/(\d+)", samplesserver.PatientHandler),
         (r"/api/instructors/(\d+)", samplesserver.InstructorHandler),
         (r"/api/courses/(\d+)", samplesserver.CourseHandler),
+        (r"/api/sessions/(\d+)", samplesserver.SessionHandler),
         (
             r"/(.*)", tornado.web.StaticFileHandler,
             {
