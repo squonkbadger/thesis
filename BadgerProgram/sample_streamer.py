@@ -93,10 +93,10 @@ if __name__ == '__main__':
 
     log.startLogging(sys.stdout)
 
-    factory = WebSocketClientFactory("ws://127.0.0.1:1912/api/samples")
+    factory = WebSocketClientFactory("ws://tassi.fi:1912/api/samples")
     factory.protocol = MyClientProtocol
 
-    reactor.connectTCP("127.0.0.1", 1912, factory)
+    reactor.connectTCP("tassi.fi", 1912, factory)
     reactor.callInThread(read_samples)
     reactor.run()
 

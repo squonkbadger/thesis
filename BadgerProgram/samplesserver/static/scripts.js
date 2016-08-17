@@ -468,7 +468,7 @@ function createSampleChart(samples, channel) {
     var x = [];
     var y = [];
     $.each(samples, function(index, sample) {
-        x[index] = sample.order_number * 0.004;
+        x[index] = sample.order_number;
         y[index] = sample.channel_data[channel];
     });
     var data = [{
@@ -480,7 +480,7 @@ function createSampleChart(samples, channel) {
     var layout = {
       title: 'Channel'+(channel+1),
       xaxis: {
-        title: 'Time (seconds)'        
+        title: 'Order number'        
       },
       yaxis: {
         title: 'Voltage',
