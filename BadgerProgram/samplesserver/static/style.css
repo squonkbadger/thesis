@@ -9,8 +9,6 @@ body {
 }
 
 .page-header {
-    background: rgba(0,0,0,1);
-    color: white;
     padding:1em;
     margin-top: 1em;
     margin-bottom:0;

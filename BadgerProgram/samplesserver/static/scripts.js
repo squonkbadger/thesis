@@ -464,58 +464,29 @@ function populateSamplesTable(samples) {
 }
 
 function createSampleChart(samples, channel) {    
-    $("#page-specific").append($("<canvas>")
-        .attr("id","sample-chart" + channel)); 
-    var canvas = $("#sample-chart" + channel);
-    var sampleArray = []    
+    $("#page-specific").append($("<div>").attr("id","myDiv"+channel));
+    var x = [];
+    var y = [];
     $.each(samples, function(index, sample) {
-        sampleTime = sample.order_number * 0.004;
-        sampleVoltage = sample.channel_data[channel];
-        sampleArray[index] = {
-            x: sampleTime,
-            y: sampleVoltage
-        };
+        x[index] = sample.order_number * 0.004;
+        y[index] = sample.channel_data[channel];
     });
-    var chart = new Chart(canvas, {
-        type: "line",
-        data: {
-            datasets:[{
-                fill: false,
-                data: sampleArray,
-                radius: 0,
-                tension: 0,
-                borderColor: "rgba(0,0,0,1)",
-                borderWidth: 1,
-            }]        
-        },
-        options: {
-            legend: {
-                display: false            
-            },
-            title: {
-                display: true, 
-                text: "Channel " + (channel + 1)            
-            },
-            scales: {
-                xAxes: [{
-                    type: 'linear',
-                    position: 'bottom',
-                    scaleLabel: {
-                        display:true,
-                        labelString: "Time (seconds)"
-                    }
-                }],
-                yAxes: [{
-                    type: "linear",
-                    scaleLabel: {
-                        display:true,
-                        labelString: "Voltage (microvolts)"                    
-                    }    
-                }]
-            },
-            
-        }      
-    });    
+    var data = [{
+        x: x,
+        y: y,
+        type: 'scatter'
+      }
+    ];
+    var layout = {
+      title: 'Channel'+(channel+1),
+      xaxis: {
+        title: 'Time (seconds)'        
+      },
+      yaxis: {
+        title: 'Voltage',
+      }
+    };
+    Plotly.newPlot('myDiv'+channel, data, layout);
 }
 
 

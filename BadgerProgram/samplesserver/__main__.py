@@ -42,7 +42,7 @@ def make_app():
     
     
 app = make_app()
-app.listen(1912, "127.0.0.1")
+app.listen(1912, "0.0.0.0")
 tornado.ioloop.IOLoop.current().start()
     
     

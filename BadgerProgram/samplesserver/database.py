@@ -99,7 +99,7 @@ class Database(object):
                 session_id
             ) VALUES (?,?,?,?,?,?,?,?,?,?)        
         """, (
-            sample["channel_data"][0],
+            1e6 * (4.5/24) * float(sample["channel_data"][0]) / 2**23,
             sample["channel_data"][1],
             sample["channel_data"][2],
             sample["channel_data"][3],
@@ -164,7 +164,7 @@ class Database(object):
             SELECT *
             FROM samples
             WHERE session_id = ?
-        """, session_id)
+        """, (session_id,))
         samples = cursor.fetchall()
         return samples
         
