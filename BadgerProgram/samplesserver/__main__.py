@@ -2,14 +2,21 @@
 """
 Created on Sun Aug 07 01:16:27 2016
 
-@author: Badger
+@author: Tatiana Tassi
 """
 
+import logging
 import tornado.ioloop
 import tornado.web
+from tornado.options import define, options, parse_command_line
 import os
 
 import samplesserver
+
+define('host', type=str, default='127.0.0.1')
+define('port', type=int, default=1912)
+
+app_log = logging.getLogger('tornado.application')
 
 
 def make_app():
@@ -40,72 +47,11 @@ def make_app():
     app.db = samplesserver.Database()
     return app
     
-    
+
+parse_command_line()    
+
+app_log.info('Running server on %s:%d', options.host, options.port)
+
 app = make_app()
-app.listen(1912, "0.0.0.0")
+app.listen(options.port, options.host)
 tornado.ioloop.IOLoop.current().start()
-    
-    
-"""
-
-from autobahn.twisted.websocket import WebSocketServerProtocol, \
-    WebSocketServerFactory
-
-
-class MyServerProtocol(WebSocketServerProtocol):
-
-    def onConnect(self, request):
-        print("Client connecting: {0}".format(request.peer))
-
-    def onOpen(self):
-        print("WebSocket connection open.")
-
-    def onMessage(self, payload, isBinary):
-        if isBinary:
-            print("Binary message received: {0} bytes".format(len(payload)))
-        else:
-            print("Text message received: {0}".format(payload.decode('utf8')))
-
-    def onClose(self, wasClean, code, reason):
-        print("WebSocket connection closed: {0}".format(reason))
-
-
-if __name__ == '__main__':
-
-    import sys
-
-    from twisted.python import log
-    from twisted.internet import reactor
-
-    log.startLogging(sys.stdout)
-
-    factory = WebSocketServerFactory("ws://127.0.0.1:1912")
-    factory.protocol = MyServerProtocol
-
-    reactor.listenTCP(1912, factory)
-    reactor.run()
-
-"""
-
-"""
-import socket
-
-
-tcp_ip = "127.0.0.1"
-tcp_port = 1912
-buffer_size = 250
-
-
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.bind((tcp_ip, tcp_port))
-sock.listen(1)
-
-conn, addr = sock.accept()
-print "Connection address:", addr
-while 1:
-    data = conn.recv(buffer_size)
-    if not data: break
-    print "received data:", data
-    conn.send(data)
-conn.close()
-"""

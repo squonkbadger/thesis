@@ -2,7 +2,7 @@
 """
 Created on Tue Aug 16 20:37:29 2016
 
-@author: Badger
+@author: Tatiana Tassi
 """
 
 import tornado.web
@@ -25,4 +25,5 @@ class CourseHandler(tornado.web.RequestHandler):
         name = self.get_body_argument("name")
         code = self.get_body_argument("code")
         credit_value = self.get_body_argument("credits")
-        self.application.db.edit_course(course_id, instructor_id, name, code, credit_value)
+        self.application.db.edit_course(course_id, instructor_id, name, code, 
+                                        credit_value)

@@ -2,7 +2,7 @@
 """
 Created on Tue Aug 09 23:21:01 2016
 
-@author: Badger
+@author: Tatiana Tassi
 """
 
 from .sample_receiver import SampleReceiver

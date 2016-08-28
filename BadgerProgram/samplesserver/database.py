@@ -2,7 +2,7 @@
 """
 Created on Tue Aug 09 23:42:12 2016
 
-@author: Badger
+@author: Tatiana Tassi
 """
 
 import sqlite3
@@ -73,16 +73,77 @@ class Database(object):
         """)
         self.conn.commit()
         
-
+    # functions for sessions table
     def create_session(self):
         cursor = self.conn.cursor()
         cursor.execute("""
-            INSERT INTO sessions(start_time, sample_rate) VALUES (?,?)
-        """, (datetime.datetime.now(),250))
+            INSERT INTO sessions(start_time,sample_rate) VALUES (?,?)
+        """, (datetime.datetime.now(), 250))
         self.conn.commit()        
         session_id = cursor.lastrowid
         return session_id
+        
+    def finalise_session(self, session_id):
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            UPDATE sessions
+            SET end_time = ?
+            WHERE id = ?
+        """, (datetime.datetime.now(), session_id))
+        self.conn.commit()
+        
+    def fetch_sessions(self):
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT 
+                id, 
+                start_time, 
+                end_time, 
+                course_id, 
+                instructor_id, 
+                patient_id, 
+                sample_rate, 
+                resolution
+            FROM sessions
+        """)
+        sessions = cursor.fetchall()
+        return sessions
     
+    def fetch_session(self, session_id): 
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT
+                id, 
+                start_time, 
+                end_time, 
+                course_id, 
+                instructor_id, 
+                patient_id, 
+                sample_rate, 
+                resolution
+            FROM sessions
+            WHERE id = ?
+        """, session_id)
+        session = cursor.fetchone()
+        return session
+    
+    def edit_session(self, session_id, course_id, instructor_id, patient_id, 
+                     sample_rate, resolution):
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            UPDATE sessions
+            SET 
+                course_id = ?, 
+                instructor_id = ?,
+                patient_id = ?,
+                sample_rate = ?,
+                resolution = ?
+            WHERE id = ?
+        """, (course_id, instructor_id, patient_id, sample_rate,
+              resolution,session_id))
+        self.conn.commit()
+        
+    # functions for samples table
     def create_sample(self, session_id, sample):
         cursor = self.conn.cursor()
         cursor.execute("""
@@ -99,7 +160,7 @@ class Database(object):
                 session_id
             ) VALUES (?,?,?,?,?,?,?,?,?,?)        
         """, (
-            1e6 * (4.5/24) * float(sample["channel_data"][0]) / 2**23,
+            sample["channel_data"][0],
             sample["channel_data"][1],
             sample["channel_data"][2],
             sample["channel_data"][3],
@@ -115,63 +176,37 @@ class Database(object):
         sample_id = cursor.lastrowid
         return sample_id
         
-    def finalise_session(self, session_id):
-        cursor = self.conn.cursor()
-        cursor.execute("""
-            UPDATE sessions
-            SET end_time = ?
-            WHERE id = ?
-        """, (datetime.datetime.now(), session_id))
-        self.conn.commit()
-        
-    def fetch_sessions(self):
-        cursor = self.conn.cursor()
-        cursor.execute("""
-            SELECT * 
-            FROM sessions
-        """)
-        sessions = cursor.fetchall()
-        return sessions
-    
-    def fetch_session(self, session_id): 
-        cursor = self.conn.cursor()
-        cursor.execute("""
-            SELECT *
-            FROM sessions
-            WHERE id = ?
-        """, session_id)
-        session = cursor.fetchone()
-        return session
-    
-    def edit_session(self, session_id, course_id, instructor_id, patient_id, sample_rate, resolution):
-        cursor = self.conn.cursor()
-        cursor.execute("""
-            UPDATE sessions
-            SET 
-                course_id = ?, 
-                instructor_id = ?,
-                patient_id = ?,
-                sample_rate = ?,
-                resolution = ?
-            
-            WHERE id = ?
-        """, (course_id, instructor_id, patient_id, sample_rate, resolution,session_id))
-        self.conn.commit()
-        
     def fetch_samples(self, session_id):
         cursor = self.conn.cursor()
         cursor.execute("""
-            SELECT *
+            SELECT 
+                id, 
+                channel1,
+                channel2, 
+                channel3,
+                channel4, 
+                channel5, 
+                channel6, 
+                channel7,
+                channel8, 
+                order_number,
+                session_id 
             FROM samples
             WHERE session_id = ?
         """, (session_id,))
         samples = cursor.fetchall()
         return samples
         
+    # functions for courses table
     def fetch_courses(self):
         cursor = self.conn.cursor()
         cursor.execute("""
-            SELECT * 
+            SELECT 
+                id, 
+                instructor_id,
+                name,
+                code,
+                credit_value
             FROM courses
         """)
         courses = cursor.fetchall()
@@ -180,7 +215,12 @@ class Database(object):
     def fetch_course(self, course_id): 
         cursor = self.conn.cursor()
         cursor.execute("""
-            SELECT *
+            SELECT 
+                id, 
+                instructor_id,
+                name,
+                code,
+                credit_value
             FROM courses
             WHERE id = ?
         """, course_id)
@@ -203,11 +243,15 @@ class Database(object):
             WHERE id = ?
         """, (instructor_id, name, code, credit_value, course_id)) 
         self.conn.commit()
-        
+    
+    # functions for instructors table 
     def fetch_instructors(self):
         cursor = self.conn.cursor()
         cursor.execute("""
-            SELECT *
+            SELECT 
+                id, 
+                name, 
+                email
             FROM instructors
         """)
         instructors = cursor.fetchall()
@@ -224,7 +268,10 @@ class Database(object):
     def fetch_instructor(self, instructor_id):
         cursor = self.conn.cursor()
         cursor.execute("""
-            SELECT *
+            SELECT 
+                id, 
+                name, 
+                email
             FROM instructors
             WHERE id = ?
         """, instructor_id)
@@ -240,6 +287,7 @@ class Database(object):
         """, (name, email, instructor_id)) 
         self.conn.commit()
         
+    # functions for patients table
     def add_patient(self, code):
         cursor = self.conn.cursor()
         cursor.execute("""
@@ -260,7 +308,9 @@ class Database(object):
     def fetch_patients(self):
         cursor = self.conn.cursor()
         cursor.execute("""
-            SELECT * 
+            SELECT 
+                id, 
+                code
             FROM patients
         """)
         patients = cursor.fetchall()
@@ -269,7 +319,9 @@ class Database(object):
     def fetch_patient(self, patient_id):
         cursor = self.conn.cursor()
         cursor.execute("""
-            SELECT *
+            SELECT 
+                id,
+                code
             FROM patients
             WHERE id = ?
         """, patient_id)

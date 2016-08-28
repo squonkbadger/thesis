@@ -2,7 +2,7 @@
 """
 Created on Tue Aug 16 19:09:45 2016
 
-@author: Badger
+@author: Tatiana Tassi
 """
 
 import tornado.web

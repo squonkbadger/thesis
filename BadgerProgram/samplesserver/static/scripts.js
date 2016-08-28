@@ -1,15 +1,24 @@
 function showNavLinks() {
     $(".nav").empty();
-    $(".nav").append($("<li><button class='btn btn-lg navbar-btn'>Sessions</button></li>")
+    $(".nav")
+        .append($(
+            "<li><button class='btn btn-lg navbar-btn'>Sessions</button></li>"
+        )
         .attr("role", "presentation")
         .attr("id", "sess-link"));
-    $(".nav").append($("<li><button class='btn btn-lg navbar-btn'>Courses</button></li>")
+    $(".nav").append($(
+        "<li><button class='btn btn-lg navbar-btn'>Courses</button></li>"
+        )
         .attr("role", "presentation")
         .attr("id", "crs-link"));
-    $(".nav").append($("<li><button class='btn btn-lg navbar-btn'>Patients</button></li>")
+    $(".nav").append($(
+        "<li><button class='btn btn-lg navbar-btn'>Patients</button></li>"
+        )
         .attr("role", "presentation")
         .attr("id", "pat-link"));
-    $(".nav").append($("<li><button class='btn btn-lg navbar-btn'>Instructors</button></li>")
+    $(".nav").append($(
+        "<li><button class='btn btn-lg navbar-btn'>Instructors</button></li>"
+        )
         .attr("role", "presentation")
         .attr("id", "instr-link"));
     $("#sess-link").click(function() {
@@ -294,7 +303,10 @@ function editCourseForm(id) {
                     $("#page-specific").append("<h2>Edit course</h2>");
                     var source = $("#course-form-template").html();
                     var template = Handlebars.compile(source);  
-                    var data = {course: course, instructors: instructors.instructors};
+                    var data = {
+                        course: course, 
+                        instructors: instructors.instructors
+                    };
                     $.each(instructors, function(index, instructor) {
                         if (instructor.id === course.instructor_id) {
                             instructor.selected = true;                        
@@ -349,7 +361,6 @@ function populateSessionsTable(sessions) {
     $("#page-specific").append(table);
     $.each(sessions, function(index, session) {
         var row = $("<tr>");
-        //row.append($("<td>").text(session.id));
         row.append($("<td>").text(session.start_time));
         row.append($("<td>").text(session.end_time));
         row.append($("<td>").text(session.course_id));
@@ -376,61 +387,57 @@ function populateSessionsTable(sessions) {
 }
 
 function editSessionForm(id) {
-    $.get("/api/sessions/" + id)
-        .done(function(session) {
-            $.get("/api/instructors")
-                .done(function(instructors) {
-                    $.get("/api/patients") 
-                        .done(function(patients) {
-                            $.get("/api/courses")
-                                .done(function(courses) {
-                                    $("#page-specific").empty();
-                                    showNavLinks();
-                                    $("#page-specific").append("<h2>Edit session</h2>");
-                                    var source = $("#session-form-template").html();
-                                    var template = Handlebars.compile(source);
-                                    var data = {
-                                        session: session, 
-                                        instructors: instructors.instructors,
-                                        courses: courses.courses,
-                                        patients: patients.patients                                    
-                                    };
-                                    $.each(instructors, function(index, instructor) {
-                                        if (instructor.id === session.instructor_id) {
-                                        instructor.selected = true;                        
-                                        }
-                                    });   
-                                    $.each(courses, function(index, course) {
-                                        if (course.id === session.course_id) {
-                                        course.selected = true;                        
-                                        }
-                                    });   
-                                    $.each(patients, function(index, patient) {
-                                        if (patient.id === session.patient_id) {
-                                        patient.selected = true;                        
-                                        }
-                                    });   
-                                    $("#page-specific").append(template(data)); 
-                                    $("#session-form").submit(function() {
-                                        $("form button").prop("disabled", true);
-                                        var sample_rate = $("#sessionRate").val();
-                                        var instructor_id = $("#sessionInstructor").val();
-                                        var course_id = $("#sessionCourse").val();
-                                        var patient_id = $("#sessionPatient").val();
-                                        var resolution = $("#sessionResolution").val();
-                                        $.post("/api/sessions/" + id, {
-                                            sample_rate: sample_rate, 
-                                            instructor_id: instructor_id, 
-                                            course_id: course_id, 
-                                            patient_id: patient_id,
-                                            resolution: resolution
-                                        });
-                                        return false;
-                                    });
-                            });
-                    });
-            });
- });
+    $.when(
+        $.get("/api/sessions/" + id),
+        $.get("/api/instructors"),
+        $.get("/api/patients"),
+        $.get("/api/courses")
+    )
+        .done(function(session, instructors, patients, courses) {
+            $("#page-specific").empty();
+            showNavLinks();
+            $("#page-specific").append("<h2>Edit session</h2>");
+            var source = $("#session-form-template").html();
+            var template = Handlebars.compile(source);
+            var data = {
+                session: session, 
+                instructors: instructors.instructors,
+                courses: courses.courses,
+                patients: patients.patients                                    
+            };
+            $.each(instructors, function(index, instructor) {
+                if (instructor.id === session.instructor_id) {
+                instructor.selected = true;                        
+                }
+            });   
+            $.each(courses, function(index, course) {
+                if (course.id === session.course_id) {
+                course.selected = true;                        
+                }
+            });   
+            $.each(patients, function(index, patient) {
+                if (patient.id === session.patient_id) {
+                patient.selected = true;                        
+                }
+            });   
+            $("#page-specific").append(template(data)); 
+            $("#session-form").submit(function() {
+                $("form button").prop("disabled", true);
+                var sample_rate = $("#sessionRate").val();
+                var instructor_id = $("#sessionInstructor").val();
+                var course_id = $("#sessionCourse").val();
+                var patient_id = $("#sessionPatient").val();
+                var resolution = $("#sessionResolution").val();
+                $.post("/api/sessions/" + id, {
+                    sample_rate: sample_rate, 
+                    instructor_id: instructor_id, 
+                    course_id: course_id, 
+                    patient_id: patient_id,
+                    resolution: resolution
+                });
+                return false;
+            });                       
+        });
 }
 
 function showSamples(ctx) {

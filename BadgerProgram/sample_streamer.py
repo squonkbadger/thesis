@@ -2,7 +2,7 @@
 """
 Created on Sun Aug 07 00:03:34 2016
 
-@author: Badger
+@author: Tatiana Tassi
 """
 
 import open_bci_v3 as bci
@@ -93,56 +93,8 @@ if __name__ == '__main__':
 
     log.startLogging(sys.stdout)
 
-    factory = WebSocketClientFactory("ws://tassi.fi:1912/api/samples")
+    factory = WebSocketClientFactory("ws://127.0.0.1:1912/api/samples")
     factory.protocol = MyClientProtocol
-
-    reactor.connectTCP("tassi.fi", 1912, factory)
+    reactor.connectTCP("127.0.0.1", 1912, factory)
     reactor.callInThread(read_samples)
     reactor.run()
-
-"""
-import socket
-import open_bci_v3 as bci
-import json
-
-sock = None
-
-
-# configure board and server connection
-def start_streaming():
-    # USB dongle settings    
-    port = "COM3"
-    baud = 115200
-    # server target
-    tcp_ip = "127.0.0.1"    
-    tcp_port = 1912
-    # open connection to server
-    global sock
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.connect((tcp_ip, tcp_port))
-    # connect to board
-    board = bci.OpenBCIBoard(port=port, baud=baud, filter_data=False)
-    board.start_streaming(process_sample)
-
-
-# format sample as json string
-def process_sample(sample):
-    dict_sample = {
-        "id": sample.id,
-        "channel_data": sample.channel_data
-    }
-    
-    json_sample = json.dumps(dict_sample)
-    send_sample(json_sample)
-
-    
-# send sample data to server    
-def send_sample(json_sample):
-   
-    sock.send(json_sample)
-    
-    
-if __name__ == "__main__":
-    start_streaming()
-    
-"""
