@@ -7,11 +7,16 @@ Created on Tue Aug 09 23:42:12 2016
 
 import sqlite3
 import datetime
+from tornado.options import define, options
+
+
+define('db', type=str, default='samples_server.db')
+
 
 class Database(object):
     
     def __init__(self):
-        self.conn = sqlite3.connect("samples_server.db",
+        self.conn = sqlite3.connect(options.db,
                                     detect_types=sqlite3.PARSE_DECLTYPES)
         self._create_tables()
         
