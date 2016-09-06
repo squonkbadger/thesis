@@ -56,7 +56,7 @@ function populatePatientsTable(patients) {
     });
     if (patients[0]) {
         var table = $("<table>")
-            .addClass("table table-bordered").attr("id", "patients-table");
+           .addClass("table table-bordered").attr("id", "patients-table");
         var thead = $("<thead>");
         var tr = $("<tr>");
         //tr.append($("<th>Patient ID</th>"));
@@ -361,28 +361,36 @@ function populateSessionsTable(sessions) {
     $("#page-specific").append(table);
     $.each(sessions, function(index, session) {
         var row = $("<tr>");
-        row.append($("<td>").text(session.start_time));
-        row.append($("<td>").text(session.end_time));
-        row.append($("<td>").text(session.course_id));
-        row.append($("<td>").text(session.patient_id));
-        row.append($("<td>").text(session.instructor_id));
-        row.append($("<td>").text(session.sample_rate + " Hz"));
-        row.append($("<td>").text(session.resolution));
-        var editButton = $("<button>Edit</button>")
+        $.get("/api/courses/"+session.course_id).done(function(course)
+	{
+		$.get("/api/patients/"+session.patient_id).done(function(patient){
+			$.get("/api/instructors/"+session.instructor_id).done(function(instructor){
+				row.append($("<td>").text(session.start_time));
+        			row.append($("<td>").text(session.end_time));
+				row.append($("<td>").text(course.name));
+				row.append($("<td>").text(patient.code));
+				row.append($("<td>").text(instructor.name));
+				row.append($("<td>").text(session.sample_rate + " Hz"));
+        			row.append($("<td>").text(session.resolution));
+				var editButton = $("<button>Edit</button>")
             .addClass("btn btn-default")
             .attr("id","edit" + session.id);
         row.append($("<td>").append(editButton));
         editButton.click(function() {
-                editSessionForm(session.id);            
-        });   
+                editSessionForm(session.id);
+        });
         var sampleButton = $("<button>View samples</button></td>")
             .addClass("btn btn-default")
             .attr("id", "samples" + session.id);
         sampleButton.click(function() {
             page("/sessions/" + session.id);
-        });       
+        });
         row.append($("<td>").append(sampleButton));
         $("#sessions-table tbody").append(row);
+
+			});
+		});
+	});
     });
 }
 
@@ -394,16 +402,16 @@ function editSessionForm(id) {
         $.get("/api/courses")
     )
         .done(function(session, instructors, patients, courses) {
-            $("#page-specific").empty();
+	    $("#page-specific").empty();
             showNavLinks();
             $("#page-specific").append("<h2>Edit session</h2>");
             var source = $("#session-form-template").html();
             var template = Handlebars.compile(source);
             var data = {
                 session: session, 
-                instructors: instructors.instructors,
-                courses: courses.courses,
-                patients: patients.patients                                    
+                instructors: instructors[0].instructors,
+                courses: courses[0].courses,
+                patients: patients[0].patients                                    
             };
             $.each(instructors, function(index, instructor) {
                 if (instructor.id === session.instructor_id) {
