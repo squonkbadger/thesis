@@ -11,7 +11,6 @@ from Queue import Queue
 from twisted.internet.defer import inlineCallbacks, CancelledError 
 import sys
 import os
-import time
 
 from twisted.python import log
 from twisted.internet import reactor, threads
@@ -93,8 +92,8 @@ if __name__ == '__main__':
 
     log.startLogging(sys.stdout)
 
-    factory = WebSocketClientFactory("ws://127.0.0.1:1912/api/samples")
+    factory = WebSocketClientFactory("ws://tassi.fi/api/samples")
     factory.protocol = MyClientProtocol
-    reactor.connectTCP("127.0.0.1", 1912, factory)
+    reactor.connectTCP("tassi.fi", 80, factory)
     reactor.callInThread(read_samples)
     reactor.run()
